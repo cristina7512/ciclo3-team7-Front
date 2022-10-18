@@ -1,32 +1,32 @@
 var selectedRow = null
 
-const host = '129.158.60.253';
+const host = '143.47.107.95';
 //const host = 'localhost';
 
 //*******   *******    *******  *******/ 
-//*******    CRUD  CLIENT     *******/ 
+//*******    CRUD  RESERVATION     *******/ 
 //*******   *******    *******  *******/ 
 
-function onClientSubmit(e) {
+function onReservationSubmit(e) {
 	event.preventDefault();
-        const formData = readFormClientData();
-        createClient(formData);
-        resetFormClient();    
+        const formData = readFormReservationData();
+        createReservation(formData);
+        resetFormReservation();    
 }
 
 //Retrieve the data
-function readFormClientData() {
+function readFormReservationData() {
     var formData = {};
-    formData["idClient"] = document.getElementById("clientId").value;
-    formData["name"] = document.getElementById("clientName").value;
-    formData["email"] = document.getElementById("clientEmail").value;
-    formData["age"] = document.getElementById("clientAge").value;
-    formData["password"] = document.getElementById("clientPassword").value;
+    formData["id"] = document.getElementById("reservationId").value;
+    formData["startDate"] = document.getElementById("reservationStartDate").value;
+    formData["devolutionDate"] = document.getElementById("reservationDevolutionDate").value;
+    formData["client"] = {"idClient": parseInt(document.getElementById("reservationClientId").value)};
+    formData["ortopedic"] = {"id": parseInt(document.getElementById("reservationOrtopedicId").value)};
     return formData;
 }
 
-function createClient(data){
-    const url = `http://${host}:8080/api/Client/save`;
+function createReservation(data){
+    const url = `http://${host}:8080/api/Reservation/save`;
 
     $.ajax({
         url : url,
@@ -45,16 +45,16 @@ function createClient(data){
             console.log('errorInsert -->', error);
         },
         complete : function(xhr, status) {
-            location.reload();
+            // location.reload();
         }
     })
 }
 //Load data
-function loadClientData(){
-    const table = document.getElementById("clientList").getElementsByTagName('tbody')[0];
+function loadReservationData(){
+    const table = document.getElementById("reservationList").getElementsByTagName('tbody')[0];
 
     $.ajax({
-        url : `http://${host}:8080/api/Client/all`,
+        url : `http://${host}:8080/api/Reservation/all`,
         data : null,
         headers: {  
             'Access-Control-Allow-Origin': true
@@ -66,20 +66,18 @@ function loadClientData(){
             data.map(item => {
                 const newRow = table.insertRow();
                 cell1 = newRow.insertCell(0);
-                    cell1.innerHTML = item.idClient;
+                    cell1.innerHTML = item.idReservation;
                 cell2 = newRow.insertCell(1);
-                    cell2.innerHTML = item.name;
+                    cell2.innerHTML = item.startDate;
                 cell3 = newRow.insertCell(2);
-                    cell3.innerHTML = item.email;
+                    cell3.innerHTML = item.startDate;
                 cell4 = newRow.insertCell(3);
-                    cell4.innerHTML = item.age;
+                    cell4.innerHTML = item.client.idClient;
                 cell5 = newRow.insertCell(4);
-                    cell5.innerHTML = item.password;
-
-
+                    cell5.innerHTML = item.ortopedic.id;
                 cell6 = newRow.insertCell(5);
-                    cell6.innerHTML = `<button onClick="clientSelect(this)">Select</button> <button onClick="clientDelete(this,${item.idClient})">Delete</button>`;
-                    
+                cell6.innerHTML = `<button onClick="reservationSelect(this)">Select</button> <button onClick="reservationDelete(this,${item.idReservation})">Delete</button>`;
+                 
             })
         },
         error: function(error) {
@@ -92,31 +90,24 @@ function loadClientData(){
     }) 
 }
 
-loadClientData();
+loadReservationData();
 //Insert the data
 
 
 //Edit the data
-function clientSelect(td) {
+function reservationSelect(td) {
     selectedRow = td.parentElement.parentElement;
-    document.getElementById("clientId").value = selectedRow.cells[0].innerHTML;
-    document.getElementById("clientName").value = selectedRow.cells[1].innerHTML;
-    document.getElementById("clientEmail").value = selectedRow.cells[2].innerHTML;
-    document.getElementById("clientAge").value = selectedRow.cells[3].innerHTML;
-    document.getElementById("clientPassword").value = selectedRow.cells[4].innerHTML;
-
+    document.getElementById("reservationId").value = selectedRow.cells[0].innerHTML;
+    document.getElementById("reservationStartDate").value = selectedRow.cells[1].innerHTML;
+    document.getElementById("reservationDevolutionDate").value = selectedRow.cells[2].innerHTML;
+    document.getElementById("reservationClientId").value = selectedRow.cells[3].innerHTML;
+    document.getElementById("reservationOrtopedicId").value = selectedRow.cells[4].innerHTML;
 }
-function clientUpdate() {
-    const url = `http://${host}:8080/api/Client/update`;
-    const formData = readFormClientData();
+function reservationUpdate() {
+    const url = `http://${host}:8080/api/Reservation/update`;
+    const formData = readFormReservationData();
     console.log('formData ->', formData)
-    const data = {
-        name: formData.name, 
-        email: formData.email, 
-        age: formData.age, 
-        password: formData.password,  
-        idClient: formData.idClient
-    }
+    const data = {startDate: formData.startDate, devolutionDate: formData.devolutionDate, id: formData.id}
     $.ajax({
         url : url,
         data : JSON.stringify(data),
@@ -134,15 +125,15 @@ function clientUpdate() {
             console.log('errorInsert -->', error);
         },
         complete : function(xhr, status) {
-            location.reload();
+            // location.reload();
         }
     })
 }
 
 //Delete the data
-function clientDelete(td, id) {
+function reservationDelete(td, id) {
     $.ajax({
-        url : `http://${host}:8080/api/Client/${id}`,
+        url : `http://${host}:8080/api/Reservation/${id}`,
         data : null,
         type : "DELETE", //POST, PUT, DELETE,
         dataType : 'json',
@@ -163,17 +154,15 @@ function clientDelete(td, id) {
     })
     if (confirm('Do you want to delete this record?')) {
         row = td.parentElement.parentElement;
-        document.getElementById('clientList').deleteRow(row.rowIndex);
-        resetFormClient();
+        document.getElementById('reservationList').deleteRow(row.rowIndex);
+        resetFormReservation();
     }
 }
 
 //Reset the data
-function resetFormClient() {
-    document.getElementById("clientId").value = '';
-    document.getElementById("clientName").value = '';
-    document.getElementById("clientEmail").value = '';
-    document.getElementById("clientAge").value = '';
-    document.getElementById("clientPassword").value = '';
+function resetFormReservation() {
+    document.getElementById("reservationId").value = '';
+    document.getElementById("reservationName").value = '';
+    document.getElementById("reservationDescription").value = '';
     selectedRow = null;
 }

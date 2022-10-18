@@ -1,31 +1,32 @@
 var selectedRow = null
 
-const host = '129.158.60.253';
+const host = '129.153.11.205';
 //const host = 'localhost';
 
 //*******   *******    *******  *******/ 
-//*******    CRUD  MESSAGE     *******/ 
+//*******    CRUD  CLIENT     *******/ 
 //*******   *******    *******  *******/ 
 
-function onMessageSubmit(e) {
+function onClientSubmit(e) {
 	event.preventDefault();
-        const formData = readFormMessageData();
-        createMessage(formData);
-        resetFormMessage();    
+        const formData = readFormClientData();
+        createClient(formData);
+        resetFormClient();    
 }
 
 //Retrieve the data
-function readFormMessageData() {
+function readFormClientData() {
     var formData = {};
-    formData["id"] = parseInt(document.getElementById("messageId").value);
-    formData["messageText"] = document.getElementById("messageText").value;
-    formData["client"] = {"idClient": parseInt(document.getElementById("messageClientId").value)};
-    formData["ortopedic"] = {"id": parseInt(document.getElementById("messageOrtopedicId").value)};
+    formData["idClient"] = document.getElementById("clientId").value;
+    formData["name"] = document.getElementById("clientName").value;
+    formData["email"] = document.getElementById("clientEmail").value;
+    formData["age"] = document.getElementById("clientAge").value;
+    formData["password"] = document.getElementById("clientPassword").value;
     return formData;
 }
 
-function createMessage(data){
-    const url = `http://${host}:8080/api/Message/save`;
+function createClient(data){
+    const url = `http://${host}:8080/api/Client/save`;
 
     $.ajax({
         url : url,
@@ -44,16 +45,16 @@ function createMessage(data){
             console.log('errorInsert -->', error);
         },
         complete : function(xhr, status) {
-            // location.reload();
+            location.reload();
         }
     })
 }
 //Load data
-function loadMessageData(){
-    const table = document.getElementById("messageList").getElementsByTagName('tbody')[0];
+function loadClientData(){
+    const table = document.getElementById("clientList").getElementsByTagName('tbody')[0];
 
     $.ajax({
-        url : `http://${host}:8080/api/Message/all`,
+        url : `http://${host}:8080/api/Client/all`,
         data : null,
         headers: {  
             'Access-Control-Allow-Origin': true
@@ -65,15 +66,19 @@ function loadMessageData(){
             data.map(item => {
                 const newRow = table.insertRow();
                 cell1 = newRow.insertCell(0);
-                    cell1.innerHTML = item.idMessage;
+                    cell1.innerHTML = item.idClient;
                 cell2 = newRow.insertCell(1);
-                    cell2.innerHTML = item.messageText;
+                    cell2.innerHTML = item.name;
                 cell3 = newRow.insertCell(2);
-                    cell3.innerHTML = item.client.idClient;
+                    cell3.innerHTML = item.email;
                 cell4 = newRow.insertCell(3);
-                    cell4.innerHTML = item.ortopedic.id;
+                    cell4.innerHTML = item.age;
                 cell5 = newRow.insertCell(4);
-                cell5.innerHTML = `<button onClick="messageSelect(this)">Select</button> <button onClick="messageDelete(this,${item.idMessage})">Delete</button>`;
+                    cell5.innerHTML = item.password;
+
+
+                cell6 = newRow.insertCell(5);
+                    cell6.innerHTML = `<button onClick="clientSelect(this)">Select</button> <button onClick="clientDelete(this,${item.idClient})">Delete</button>`;
                     
             })
         },
@@ -87,25 +92,30 @@ function loadMessageData(){
     }) 
 }
 
-loadMessageData();
+loadClientData();
 //Insert the data
 
 
 //Edit the data
-function messageSelect(td) {
+function clientSelect(td) {
     selectedRow = td.parentElement.parentElement;
-    document.getElementById("messageId").value = selectedRow.cells[0].innerHTML;
-    document.getElementById("messageText").value = selectedRow.cells[1].innerHTML;
-    document.getElementById("messageClientId").value = selectedRow.cells[2].innerHTML;
-    document.getElementById("messageOrtopedicId").value = selectedRow.cells[3].innerHTML;
+    document.getElementById("clientId").value = selectedRow.cells[0].innerHTML;
+    document.getElementById("clientName").value = selectedRow.cells[1].innerHTML;
+    document.getElementById("clientEmail").value = selectedRow.cells[2].innerHTML;
+    document.getElementById("clientAge").value = selectedRow.cells[3].innerHTML;
+    document.getElementById("clientPassword").value = selectedRow.cells[4].innerHTML;
+
 }
-function messageUpdate() {
-    const url = `http://${host}:8080/api/Message/update`;
-    const formData = readFormMessageData();
+function clientUpdate() {
+    const url = `http://${host}:8080/api/Client/update`;
+    const formData = readFormClientData();
     console.log('formData ->', formData)
     const data = {
-        messageText: formData.messageText,
-        idMessage: formData.id
+        name: formData.name, 
+        email: formData.email, 
+        age: formData.age, 
+        password: formData.password,  
+        idClient: formData.idClient
     }
     $.ajax({
         url : url,
@@ -124,15 +134,15 @@ function messageUpdate() {
             console.log('errorInsert -->', error);
         },
         complete : function(xhr, status) {
-            // location.reload();
+            location.reload();
         }
     })
 }
 
 //Delete the data
-function messageDelete(td, id) {
+function clientDelete(td, id) {
     $.ajax({
-        url : `http://${host}:8080/api/Message/${id}`,
+        url : `http://${host}:8080/api/Client/${id}`,
         data : null,
         type : "DELETE", //POST, PUT, DELETE,
         dataType : 'json',
@@ -141,7 +151,7 @@ function messageDelete(td, id) {
         },
         success: function(data) {
             console.log('Eliminado -->', data);
-            // location.reload();
+            location.reload();
         },
         error: function(error) {
             alert('Error');
@@ -153,16 +163,17 @@ function messageDelete(td, id) {
     })
     if (confirm('Do you want to delete this record?')) {
         row = td.parentElement.parentElement;
-        document.getElementById('messageList').deleteRow(row.rowIndex);
-        resetFormMessage();
+        document.getElementById('clientList').deleteRow(row.rowIndex);
+        resetFormClient();
     }
 }
 
 //Reset the data
-function resetFormMessage() {
-    document.getElementById("messageId").value = '';
-    document.getElementById("messageText").value = '';
-    document.getElementById("messageClientId").value = '';
-    document.getElementById("messageOrtopedicId").value = '';
+function resetFormClient() {
+    document.getElementById("clientId").value = '';
+    document.getElementById("clientName").value = '';
+    document.getElementById("clientEmail").value = '';
+    document.getElementById("clientAge").value = '';
+    document.getElementById("clientPassword").value = '';
     selectedRow = null;
 }

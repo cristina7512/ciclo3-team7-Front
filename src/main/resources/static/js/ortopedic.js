@@ -1,32 +1,33 @@
 var selectedRow = null
 
-const host = '129.158.60.253';
+const host = '143.47.107.95';
 //const host = 'localhost';
 
 //*******   *******    *******  *******/ 
-//*******    CRUD  RESERVATION     *******/ 
+//*******    CRUD  ORTOPEDIC     *******/ 
 //*******   *******    *******  *******/ 
 
-function onReservationSubmit(e) {
+function onOrtopedicSubmit(e) {
 	event.preventDefault();
-        const formData = readFormReservationData();
-        createReservation(formData);
-        resetFormReservation();    
+        const formData = readFormOrtopedicData();
+        createOrtopedic(formData);
+        resetFormOrtopedic();    
 }
 
 //Retrieve the data
-function readFormReservationData() {
+function readFormOrtopedicData() {
     var formData = {};
-    formData["id"] = document.getElementById("reservationId").value;
-    formData["startDate"] = document.getElementById("reservationStartDate").value;
-    formData["devolutionDate"] = document.getElementById("reservationDevolutionDate").value;
-    formData["client"] = {"idClient": parseInt(document.getElementById("reservationClientId").value)};
-    formData["ortopedic"] = {"id": parseInt(document.getElementById("reservationOrtopedicId").value)};
+    formData["id"] = document.getElementById("ortopedicId").value;
+    formData["name"] = document.getElementById("ortopedicName").value;
+    formData["brand"] = document.getElementById("ortopedicBrand").value;
+    formData["year"] = parseInt(document.getElementById("ortopedicYear").value) ;
+    formData["description"] = document.getElementById("ortopedicDescription").value;
+    formData["category"] = {"id": parseInt(document.getElementById("ortopedicCategory").value)};
     return formData;
 }
 
-function createReservation(data){
-    const url = `http://${host}:8080/api/Reservation/save`;
+function createOrtopedic(data){
+    const url = `http://${host}:8080/api/Ortopedic/save`;
 
     $.ajax({
         url : url,
@@ -45,16 +46,16 @@ function createReservation(data){
             console.log('errorInsert -->', error);
         },
         complete : function(xhr, status) {
-            // location.reload();
+            location.reload();
         }
     })
 }
 //Load data
-function loadReservationData(){
-    const table = document.getElementById("reservationList").getElementsByTagName('tbody')[0];
+function loadOrtopedicData(){
+    const table = document.getElementById("ortopedicList").getElementsByTagName('tbody')[0];
 
     $.ajax({
-        url : `http://${host}:8080/api/Reservation/all`,
+        url : `http://${host}:8080/api/Ortopedic/all`,
         data : null,
         headers: {  
             'Access-Control-Allow-Origin': true
@@ -66,18 +67,19 @@ function loadReservationData(){
             data.map(item => {
                 const newRow = table.insertRow();
                 cell1 = newRow.insertCell(0);
-                    cell1.innerHTML = item.idReservation;
+                    cell1.innerHTML = item.id;
                 cell2 = newRow.insertCell(1);
-                    cell2.innerHTML = item.startDate;
+                    cell2.innerHTML = item.name;
                 cell3 = newRow.insertCell(2);
-                    cell3.innerHTML = item.startDate;
+                    cell3.innerHTML = item.brand;
                 cell4 = newRow.insertCell(3);
-                    cell4.innerHTML = item.client.idClient;
+                    cell4.innerHTML = item.year;
                 cell5 = newRow.insertCell(4);
-                    cell5.innerHTML = item.ortopedic.id;
+                    cell5.innerHTML = item.description;
                 cell6 = newRow.insertCell(5);
-                cell6.innerHTML = `<button onClick="reservationSelect(this)">Select</button> <button onClick="reservationDelete(this,${item.idReservation})">Delete</button>`;
-                 
+                    cell6.innerHTML = item.category.id;
+                cell7 = newRow.insertCell(6);
+                cell7.innerHTML = `<button onClick="ortopedicSelect(this)">Select</button> <button onClick="ortopedicDelete(this,${item.id})">Delete</button>`;   
             })
         },
         error: function(error) {
@@ -90,24 +92,25 @@ function loadReservationData(){
     }) 
 }
 
-loadReservationData();
+loadOrtopedicData();
 //Insert the data
 
 
 //Edit the data
-function reservationSelect(td) {
+function ortopedicSelect(td) {
     selectedRow = td.parentElement.parentElement;
-    document.getElementById("reservationId").value = selectedRow.cells[0].innerHTML;
-    document.getElementById("reservationStartDate").value = selectedRow.cells[1].innerHTML;
-    document.getElementById("reservationDevolutionDate").value = selectedRow.cells[2].innerHTML;
-    document.getElementById("reservationClientId").value = selectedRow.cells[3].innerHTML;
-    document.getElementById("reservationOrtopedicId").value = selectedRow.cells[4].innerHTML;
+    document.getElementById("ortopedicId").value = selectedRow.cells[0].innerHTML;
+    document.getElementById("ortopedicName").value = selectedRow.cells[1].innerHTML;
+    document.getElementById("ortopedicBrand").value = selectedRow.cells[2].innerHTML;
+    document.getElementById("ortopedicYear").value = selectedRow.cells[3].innerHTML;
+    document.getElementById("ortopedicDescription").value = selectedRow.cells[4].innerHTML;
+    document.getElementById("ortopedicCategory").value = selectedRow.cells[5].innerHTML;
 }
-function reservationUpdate() {
-    const url = `http://${host}:8080/api/Reservation/update`;
-    const formData = readFormReservationData();
+function ortopedicUpdate() {
+    const url = `http://${host}:8080/api/Ortopedic/update`;
+    const formData = readFormOrtopedicData();
     console.log('formData ->', formData)
-    const data = {startDate: formData.startDate, devolutionDate: formData.devolutionDate, id: formData.id}
+    const data = {name: formData.name, brand: formData.brand, year: formData.year, description: formData.description, id: formData.id}
     $.ajax({
         url : url,
         data : JSON.stringify(data),
@@ -125,15 +128,15 @@ function reservationUpdate() {
             console.log('errorInsert -->', error);
         },
         complete : function(xhr, status) {
-            // location.reload();
+            location.reload();
         }
     })
 }
 
 //Delete the data
-function reservationDelete(td, id) {
+function ortopedicDelete(td, id) {
     $.ajax({
-        url : `http://${host}:8080/api/Reservation/${id}`,
+        url : `http://${host}:8080/api/Ortopedic/${id}`,
         data : null,
         type : "DELETE", //POST, PUT, DELETE,
         dataType : 'json',
@@ -154,15 +157,18 @@ function reservationDelete(td, id) {
     })
     if (confirm('Do you want to delete this record?')) {
         row = td.parentElement.parentElement;
-        document.getElementById('reservationList').deleteRow(row.rowIndex);
-        resetFormReservation();
+        document.getElementById('ortopedicList').deleteRow(row.rowIndex);
+        resetFormOrtopedic();
     }
 }
 
 //Reset the data
-function resetFormReservation() {
-    document.getElementById("reservationId").value = '';
-    document.getElementById("reservationName").value = '';
-    document.getElementById("reservationDescription").value = '';
+function resetFormOrtopedic() {
+    document.getElementById("ortopedicId").value = '';
+    document.getElementById("ortopedicName").value = '';
+    document.getElementById("ortopedicBrand").value = '';
+    document.getElementById("ortopedicYear").value = '';
+    document.getElementById("ortopedicDescription").value = '';
+    document.getElementById("ortopedicCategory").value = '';
     selectedRow = null;
 }

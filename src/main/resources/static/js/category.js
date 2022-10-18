@@ -1,33 +1,30 @@
 var selectedRow = null
 
-const host = '129.158.60.253';
+const host = '143.47.107.95';
 //const host = 'localhost';
 
 //*******   *******    *******  *******/ 
-//*******    CRUD  ORTOPEDIC     *******/ 
+//*******    CRUD  CATEGORY     *******/ 
 //*******   *******    *******  *******/ 
 
-function onOrtopedicSubmit(e) {
+function onCategorySubmit(e) {
 	event.preventDefault();
-        const formData = readFormOrtopedicData();
-        createOrtopedic(formData);
-        resetFormOrtopedic();    
+        const formData = readFormCategoryData();
+        createCategory(formData);
+        resetFormCategory();    
 }
 
 //Retrieve the data
-function readFormOrtopedicData() {
+function readFormCategoryData() {
     var formData = {};
-    formData["id"] = document.getElementById("ortopedicId").value;
-    formData["name"] = document.getElementById("ortopedicName").value;
-    formData["brand"] = document.getElementById("ortopedicBrand").value;
-    formData["year"] = parseInt(document.getElementById("ortopedicYear").value) ;
-    formData["description"] = document.getElementById("ortopedicDescription").value;
-    formData["category"] = {"id": parseInt(document.getElementById("ortopedicCategory").value)};
+    formData["id"] = document.getElementById("categoryId").value;
+    formData["name"] = document.getElementById("categoryName").value;
+    formData["description"] = document.getElementById("categoryDescription").value;
     return formData;
 }
 
-function createOrtopedic(data){
-    const url = `http://${host}:8080/api/Ortopedic/save`;
+function createCategory(data){
+    const url = `http://${host}:8080/api/Category/save`;
 
     $.ajax({
         url : url,
@@ -51,11 +48,11 @@ function createOrtopedic(data){
     })
 }
 //Load data
-function loadOrtopedicData(){
-    const table = document.getElementById("ortopedicList").getElementsByTagName('tbody')[0];
+function loadCategoryData(){
+    const table = document.getElementById("categoryList").getElementsByTagName('tbody')[0];
 
     $.ajax({
-        url : `http://${host}:8080/api/Ortopedic/all`,
+        url : `http://${host}:8080/api/Category/all`,
         data : null,
         headers: {  
             'Access-Control-Allow-Origin': true
@@ -71,15 +68,10 @@ function loadOrtopedicData(){
                 cell2 = newRow.insertCell(1);
                     cell2.innerHTML = item.name;
                 cell3 = newRow.insertCell(2);
-                    cell3.innerHTML = item.brand;
+                    cell3.innerHTML = item.description;
                 cell4 = newRow.insertCell(3);
-                    cell4.innerHTML = item.year;
-                cell5 = newRow.insertCell(4);
-                    cell5.innerHTML = item.description;
-                cell6 = newRow.insertCell(5);
-                    cell6.innerHTML = item.category.id;
-                cell7 = newRow.insertCell(6);
-                cell7.innerHTML = `<button onClick="ortopedicSelect(this)">Select</button> <button onClick="ortopedicDelete(this,${item.id})">Delete</button>`;   
+                cell4.innerHTML = `<button onClick="categorySelect(this)">Select</button> <button onClick="categoryDelete(this,${item.id})">Delete</button>`;
+                    
             })
         },
         error: function(error) {
@@ -92,25 +84,22 @@ function loadOrtopedicData(){
     }) 
 }
 
-loadOrtopedicData();
+loadCategoryData();
 //Insert the data
 
 
 //Edit the data
-function ortopedicSelect(td) {
+function categorySelect(td) {
     selectedRow = td.parentElement.parentElement;
-    document.getElementById("ortopedicId").value = selectedRow.cells[0].innerHTML;
-    document.getElementById("ortopedicName").value = selectedRow.cells[1].innerHTML;
-    document.getElementById("ortopedicBrand").value = selectedRow.cells[2].innerHTML;
-    document.getElementById("ortopedicYear").value = selectedRow.cells[3].innerHTML;
-    document.getElementById("ortopedicDescription").value = selectedRow.cells[4].innerHTML;
-    document.getElementById("ortopedicCategory").value = selectedRow.cells[5].innerHTML;
+    document.getElementById("categoryId").value = selectedRow.cells[0].innerHTML;
+    document.getElementById("categoryName").value = selectedRow.cells[1].innerHTML;
+    document.getElementById("categoryDescription").value = selectedRow.cells[2].innerHTML;
 }
-function ortopedicUpdate() {
-    const url = `http://${host}:8080/api/Ortopedic/update`;
-    const formData = readFormOrtopedicData();
+function categoryUpdate() {
+    const url = `http://${host}:8080/api/Category/update`;
+    const formData = readFormCategoryData();
     console.log('formData ->', formData)
-    const data = {name: formData.name, brand: formData.brand, year: formData.year, description: formData.description, id: formData.id}
+    const data = {name: formData.name, description: formData.description, id: formData.id}
     $.ajax({
         url : url,
         data : JSON.stringify(data),
@@ -134,9 +123,9 @@ function ortopedicUpdate() {
 }
 
 //Delete the data
-function ortopedicDelete(td, id) {
+function categoryDelete(td, id) {
     $.ajax({
-        url : `http://${host}:8080/api/Ortopedic/${id}`,
+        url : `http://${host}:8080/api/Category/${id}`,
         data : null,
         type : "DELETE", //POST, PUT, DELETE,
         dataType : 'json',
@@ -157,18 +146,15 @@ function ortopedicDelete(td, id) {
     })
     if (confirm('Do you want to delete this record?')) {
         row = td.parentElement.parentElement;
-        document.getElementById('ortopedicList').deleteRow(row.rowIndex);
-        resetFormOrtopedic();
+        document.getElementById('categoryList').deleteRow(row.rowIndex);
+        resetFormCategory();
     }
 }
 
 //Reset the data
-function resetFormOrtopedic() {
-    document.getElementById("ortopedicId").value = '';
-    document.getElementById("ortopedicName").value = '';
-    document.getElementById("ortopedicBrand").value = '';
-    document.getElementById("ortopedicYear").value = '';
-    document.getElementById("ortopedicDescription").value = '';
-    document.getElementById("ortopedicCategory").value = '';
+function resetFormCategory() {
+    document.getElementById("categoryId").value = '';
+    document.getElementById("categoryName").value = '';
+    document.getElementById("categoryDescription").value = '';
     selectedRow = null;
 }

@@ -1,35 +1,31 @@
 var selectedRow = null
 
-const host = '129.158.60.253';
+const host = '143.47.107.95';
 //const host = 'localhost';
 
 //*******   *******    *******  *******/ 
-//*******    CRUD  FARM     *******/ 
+//*******    CRUD  MESSAGE     *******/ 
 //*******   *******    *******  *******/ 
 
-function onFarmSubmit(e) {
+function onMessageSubmit(e) {
 	event.preventDefault();
-        const formData = readFormFarmData();
-        createFarm(formData);
-        resetFormFarm();    
+        const formData = readFormMessageData();
+        createMessage(formData);
+        resetFormMessage();    
 }
 
 //Retrieve the data
-function readFormFarmData() {
+function readFormMessageData() {
     var formData = {};
-    formData["id"] = document.getElementById("farmId").value;
-    formData["name"] = document.getElementById("farmName").value;
-    formData["address"] = document.getElementById("farmAddress").value;
-    formData["extension"] = parseInt(document.getElementById("farmExtension").value);
-    formData["category"] = {
-        "id": parseInt(document.getElementById("farmCategoryId").value)
-    },
-    formData["description"] = document.getElementById("farmDescription").value;
+    formData["id"] = parseInt(document.getElementById("messageId").value);
+    formData["messageText"] = document.getElementById("messageText").value;
+    formData["client"] = {"idClient": parseInt(document.getElementById("messageClientId").value)};
+    formData["ortopedic"] = {"id": parseInt(document.getElementById("messageOrtopedicId").value)};
     return formData;
 }
 
-function createFarm(data){
-    const url = `http://${host}:8080/api/Farm/save`;
+function createMessage(data){
+    const url = `http://${host}:8080/api/Message/save`;
 
     $.ajax({
         url : url,
@@ -48,16 +44,16 @@ function createFarm(data){
             console.log('errorInsert -->', error);
         },
         complete : function(xhr, status) {
-            location.reload();
+            // location.reload();
         }
     })
 }
 //Load data
-function loadFarmData(){
-    const table = document.getElementById("farmList").getElementsByTagName('tbody')[0];
+function loadMessageData(){
+    const table = document.getElementById("messageList").getElementsByTagName('tbody')[0];
 
     $.ajax({
-        url : `http://${host}:8080/api/Farm/all`,
+        url : `http://${host}:8080/api/Message/all`,
         data : null,
         headers: {  
             'Access-Control-Allow-Origin': true
@@ -69,19 +65,16 @@ function loadFarmData(){
             data.map(item => {
                 const newRow = table.insertRow();
                 cell1 = newRow.insertCell(0);
-                    cell1.innerHTML = item.id;
+                    cell1.innerHTML = item.idMessage;
                 cell2 = newRow.insertCell(1);
-                    cell2.innerHTML = item.name;
+                    cell2.innerHTML = item.messageText;
                 cell3 = newRow.insertCell(2);
-                    cell3.innerHTML = item.address;
+                    cell3.innerHTML = item.client.idClient;
                 cell4 = newRow.insertCell(3);
-                    cell4.innerHTML = item.extension;
+                    cell4.innerHTML = item.ortopedic.id;
                 cell5 = newRow.insertCell(4);
-                    cell5.innerHTML = item.description;
-                cell6 = newRow.insertCell(5);
-                    cell6.innerHTML = item.category.id;
-                cell7 = newRow.insertCell(6);
-                cell7.innerHTML = `<button onClick="farmSelect(this)">Select</button> <button onClick="farmDelete(this,${item.id})">Delete</button>`;
+                cell5.innerHTML = `<button onClick="messageSelect(this)">Select</button> <button onClick="messageDelete(this,${item.idMessage})">Delete</button>`;
+                    
             })
         },
         error: function(error) {
@@ -94,30 +87,26 @@ function loadFarmData(){
     }) 
 }
 
-loadFarmData();
+loadMessageData();
 //Insert the data
 
 
 //Edit the data
-function farmSelect(td) {
+function messageSelect(td) {
     selectedRow = td.parentElement.parentElement;
-    document.getElementById("farmId").value = selectedRow.cells[0].innerHTML;
-    document.getElementById("farmName").value = selectedRow.cells[1].innerHTML;
-    document.getElementById("farmAddress").value = selectedRow.cells[2].innerHTML;
-    document.getElementById("farmExtension").value = selectedRow.cells[3].innerHTML;
-    document.getElementById("farmDescription").value = selectedRow.cells[4].innerHTML;
-    document.getElementById("farmCategoryId").value = selectedRow.cells[5].innerHTML;
+    document.getElementById("messageId").value = selectedRow.cells[0].innerHTML;
+    document.getElementById("messageText").value = selectedRow.cells[1].innerHTML;
+    document.getElementById("messageClientId").value = selectedRow.cells[2].innerHTML;
+    document.getElementById("messageOrtopedicId").value = selectedRow.cells[3].innerHTML;
 }
-function farmUpdate() {
-    const url = `http://${host}:8080/api/Farm/update`;
-    const formData = readFormFarmData();
+function messageUpdate() {
+    const url = `http://${host}:8080/api/Message/update`;
+    const formData = readFormMessageData();
     console.log('formData ->', formData)
     const data = {
-        name: formData.name, 
-        address: formData.address,
-        extension: formData.extension,
-        description: formData.description, 
-        id: formData.id}
+        messageText: formData.messageText,
+        idMessage: formData.id
+    }
     $.ajax({
         url : url,
         data : JSON.stringify(data),
@@ -135,15 +124,15 @@ function farmUpdate() {
             console.log('errorInsert -->', error);
         },
         complete : function(xhr, status) {
-            location.reload();
+            // location.reload();
         }
     })
 }
 
 //Delete the data
-function farmDelete(td, id) {
+function messageDelete(td, id) {
     $.ajax({
-        url : `http://${host}:8080/api/Farm/${id}`,
+        url : `http://${host}:8080/api/Message/${id}`,
         data : null,
         type : "DELETE", //POST, PUT, DELETE,
         dataType : 'json',
@@ -152,7 +141,7 @@ function farmDelete(td, id) {
         },
         success: function(data) {
             console.log('Eliminado -->', data);
-            location.reload();
+            // location.reload();
         },
         error: function(error) {
             alert('Error');
@@ -164,15 +153,16 @@ function farmDelete(td, id) {
     })
     if (confirm('Do you want to delete this record?')) {
         row = td.parentElement.parentElement;
-        document.getElementById('farmList').deleteRow(row.rowIndex);
-        resetFormFarm();
+        document.getElementById('messageList').deleteRow(row.rowIndex);
+        resetFormMessage();
     }
 }
 
 //Reset the data
-function resetFormFarm() {
-    document.getElementById("farmId").value = '';
-    document.getElementById("farmName").value = '';
-    document.getElementById("farmDescription").value = '';
+function resetFormMessage() {
+    document.getElementById("messageId").value = '';
+    document.getElementById("messageText").value = '';
+    document.getElementById("messageClientId").value = '';
+    document.getElementById("messageOrtopedicId").value = '';
     selectedRow = null;
 }
